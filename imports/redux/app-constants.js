@@ -1,0 +1,6 @@
+
+export const SELECT_CAMPAIGN   = 'app/SELECT_CAMPAIGN';
+export const UNSELECT_CAMPAIGN = 'app/UNSELECT_CAMPAIGN';
+
+export const SELECT_CHARACTER   = 'app/SELECT_CHARACTER';
+export const UNSELECT_CHARACTER = 'app/UNSELECT_CHARACTER';

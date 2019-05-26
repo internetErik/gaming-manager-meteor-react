@@ -1,0 +1,20 @@
+$bp-lgx: 1700px;
+$bp-lg : 1097px;
+$bp-md : 784px;
+$bp-sm : 560px;
+$bp-smx: 400px;
+
+$bp-lgx-mx: (name: '\\@lgx', cond: 'all and (max-width: ' + $bp-lgx + ')');
+$bp-lg-mx : (name: '\\@lg' , cond: 'all and (max-width: ' + $bp-lg + ')');
+$bp-md-mx : (name: '\\@md' , cond: 'all and (max-width: ' + $bp-md + ')');
+$bp-sm-mx : (name: '\\@sm' , cond: 'all and (max-width: ' + $bp-sm + ')');
+$bp-smx-mx: (name: '\\@smx', cond: 'all and (max-width: ' + $bp-smx + ')');
+
+$bp-lgx-mn: (name: '\\@lgx-mn', cond: 'all and (min-width: ' + $bp-lgx + ')');
+$bp-lg-mn : (name: '\\@lg-mn',  cond: 'all and (min-width: ' + $bp-lg + ')');
+$bp-md-mn : (name: '\\@md-mn',  cond: 'all and (min-width: ' + $bp-md + ')');
+$bp-sm-mn : (name: '\\@sm-mn',  cond: 'all and (min-width: ' + $bp-sm + ')');
+$bp-smx-mn: (name: '\\@smx-mn', cond: 'all and (min-width: ' + $bp-smx + ')');
+
+
+$bp-sm-h: (name: '\\@sm-h', cond: 'all and (max-height: ' + $bp-smx + ')');

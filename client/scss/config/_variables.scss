@@ -1,0 +1,61 @@
+//variable naming
+// use $<property>-description: value
+  // ex.
+  // $color-light-blue
+  // $width-large
+
+// base font -- assuming we are working with font-size: 10px;
+// default is 18px
+$font-size-base: 2.1rem;
+
+// wire framing colors
+$color-pure-black    : #000;
+$color-black         : #101010;
+$color-white         : #ffffff;
+$color-barley-white  : #FFF6C9;
+$color-lightergray   : #E5E5E5;
+$color-lightgray     : #D8D8D8;
+$color-gray          : #9C9C9C;
+$color-darkgray      : #7C7C7C;
+$color-supernova     : #F3C800;
+$color-razzmatazz    : #F30158;
+$color-golddrop		   : #F47E00;
+$color-havelock-blue : #4F93E2;
+
+// width of site's content
+$width-wrapper: 1000px;
+
+// the footer is always supposed to be on the bottom of the page, unless the
+// content naturally pushes the footer below the fold. However, some content
+// doesn't add to the document height, and there can be cases where the footer
+// will appear above other content when the browser has a small view height.
+//
+// When a browsers height is less than this variable, then we need to force the
+// footer below the bottom of the screen so everything will fit the following
+// pages/components determine this cutoff as necessary:
+//   home page, navigation
+$height-cutoff-point: 750px;
+
+$padding-grid-side: 20px;
+$padding-grid-container: 0 $padding-grid-side;
+
+// heights/widths
+$height-header   : 72px;
+$height-header-md: 72px;
+$height-header-sm: 72px;
+$height-footer   : 240px;
+$height-footer-md: 240px;
+$height-footer-sm: 240px;
+
+$min-height-site   : $height-cutoff-point;
+$min-height-site-sm: $height-cutoff-point + 400px;
+
+// site colors - often named using http://chir.ag/projects/name-that-color
+$color-background : $color-white;
+
+// transparent
+$color-black-transparent: rgba(#000, .25);
+
+//$color- #ce1a37;
+//$color- #db2c59;
+// nav colors purple, brass, dark-blue, bright-red, neon-yellow, almond, mid-blue

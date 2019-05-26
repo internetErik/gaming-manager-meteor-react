@@ -1,0 +1,18 @@
+.site-body {
+  min-height: calc(100vh - #{$height-footer});
+  padding-top: $height-header;
+
+  @media all and (max-width: $bp-md) {
+    min-height: calc(100vh - #{$height-footer-md});
+    padding-top: $height-header-md;
+  }
+
+  @media all and (max-height: $height-cutoff-point) {
+    min-height: $min-height-site;
+  }
+
+  @media all and (max-width: $bp-sm) {
+    min-height: calc(100vh - #{$height-footer-sm});
+    padding-top: $height-header-sm;
+  }
+}

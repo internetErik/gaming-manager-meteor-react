@@ -1,0 +1,11 @@
+.header {
+  height: $height-header;
+
+  @media all and (max-width: $bp-md) {
+    height: $height-header-md;
+  }
+
+  @media all and (max-width: $bp-sm) {
+    height: $height-header-sm;
+  }
+}
