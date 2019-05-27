@@ -17,3 +17,16 @@ export const getDirtyFields = initialDirty =>
  */
 export const formHasErrors = (initialErrors, state) =>
   Object.keys(initialErrors).reduce((acc, key) => acc || state[key], false)
+
+/**
+ * Get an object with all the values we are concerned with for the form
+ *
+ * @param  {Object} initialValues The object with initial values, used to lookup interesting fields
+ * @param  {Object} state         The state of the form
+ * @return {Object}               Collection of all the values we need for the form
+ */
+export const getFormValues = (initialValues, state, keyTransform = v=>v) =>
+  Object.keys(initialValues).reduce((acc, key) => ({
+    ...acc,
+    [keyTransform(key)] : state[key]
+  }), {})

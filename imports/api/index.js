@@ -1,6 +1,6 @@
 import { Characters } from './characters';
 import { Campaigns }  from './campaigns';
-import { Rolls }      from './rolls';
+import { Roll }       from './roll';
 import { Spells }     from './spells';
 import { Skills }     from './skills';
 import { Feats }      from './feats';
@@ -10,7 +10,7 @@ import { Battles }    from './battles';
 export {
   Characters,
   Campaigns,
-  Rolls,
+  Roll,
   Spells,
   Skills,
   Feats,

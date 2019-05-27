@@ -1,19 +1,21 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withTracker } from 'meteor/react-meteor-data';
+import { connect } from 'react-redux';
 
 import {
   InputText,
   InputTextarea,
+  InputInt,
   InputDate,
   InputSelect,
   formHasErrors,
+  getFormValues,
 } from '../../inputs';
 
 import {
-  defaultCharacter,
   initValues,
+  testValues,
   initDirty,
   initErrors,
 } from './constants';
@@ -31,17 +33,66 @@ class CharacterFormPage extends React.Component {
     }
   }
 
+  componentDidMount() {
+    window.testData = this.testData;
+  }
+
+  testData = () => this.setState({ ...testValues }, this.formValidation)
+
   handleFieldChanged = change => this.setState({ ...change, formBottomMessage: '' }, this.formValidation)
 
   formValidation = () => new Promise((resolve, reject) => {
-    const { campaignNameValue, campaignNameDirty } = this.state;
+    const {
+      firstNameValue     , firstNameDirty,
+      characterTypeValue,
+      heightMValue       , heightMDirty,
+      heightCmValue      , heightCmDirty,
+      weightValue        , weightDirty,
+      hpValue            , hpDirty,
+      strValue           , strDirty,
+      intValue           , intDirty,
+      wisValue           , wisDirty,
+      conValue           , conDirty,
+      dexValue           , dexDirty,
+      chaValue           , chaDirty,
+    } = this.state;
+
     const errors = {}
 
-    if(campaignNameDirty) {
-      errors.campaignNameRequired = campaignNameValue === '';
-    }
+    if(firstNameDirty)
+      errors.firstNameRequired = firstNameValue === '';
 
-    this.setState(errors, resolve);
+    if(heightMDirty)
+      errors.heightMRequired = heightMValue === '';
+
+    if(heightCmDirty)
+      errors.heightCmRequired = heightCmValue === '';
+
+    if(weightDirty)
+      errors.weightRequired = weightValue === '';
+
+    if(hpDirty)
+      errors.hpRequired = hpValue === '';
+
+    if(strDirty)
+      errors.strRequired = strValue === '';
+
+    if(intDirty)
+      errors.intRequired = intValue === '';
+
+    if(wisDirty)
+      errors.wisRequired = wisValue === '';
+
+    if(conDirty)
+      errors.conRequired = conValue === '';
+
+    if(dexDirty)
+      errors.dexRequired = dexValue === '';
+
+    if(chaDirty)
+      errors.chaRequired = chaValue === '';
+
+    this.setState({ ...initErrors, ...errors }, resolve);
   })
 
   handleSubmit = e => {
@@ -50,28 +101,20 @@ class CharacterFormPage extends React.Component {
       this.formValidation()
       .then(() => {
         if(!formHasErrors(initErrors, this.state) && !this.state.buttonDisabled)
-          this.setState({ buttonDisabled: true, buttonText: 'Processing'}, this.addCampaign);
+          this.setState({ buttonDisabled: true, buttonText: 'Processing'}, this.addCharacter);
         else
           this.setState({ formBottomMessage: 'The form has errors', })
       });
     });
   }
 
-  addCharacter = characterValues => {
+  addCharacter = () => {
+    const characterValues = getFormValues(initValues, this.state, key => key.substr(0, key.length - 5));
     const { currentUser, selectedCampaign, history } = this.props;
     const character = {
-      ...defaultCharacter,
       userId        : currentUser._id,
       campaignId    : selectedCampaign._id,
-      // reduce all values for the character
-      ...(
-        Object.keys(characterValues)
-        .reduce((acc, key) => ({
-          ...acc,
-          // length - 5 in order to remove 'Value'
-          [ key.substr(0, key.length - 5) ] : characterValues[key],
-        }) ,{})
-      )
+      ...characterValues,
     };
 
     Meteor.call('character.insert', character, (e, characterId) => {
@@ -109,18 +152,10 @@ class CharacterFormPage extends React.Component {
 
       // error
       firstNameRequired,
-      middleNameRequired,
-      lastNameRequired,
-      titleRequired,
       characterTypeRequired,
-      raceRequired,
-      sexRequired,
       heightMRequired,
       heightCmRequired,
       weightRequired,
-      birthdayRequired,
-      ageRequired,
-      descriptionRequired,
       hpRequired,
       strRequired,
       intRequired,
@@ -128,7 +163,6 @@ class CharacterFormPage extends React.Component {
       conRequired,
       dexRequired,
       chaRequired,
-      backstoryRequired,
 
       // other
       buttonDisabled,
@@ -213,36 +247,39 @@ class CharacterFormPage extends React.Component {
               setFieldDirty={this.handleFieldChanged}
             />
           </div>
-          <div className="p10-0 df aic">
-            <InputText
-              className="dib"
-              labelText="Height"
-              fieldName="heightM"
-              fieldValue={heightMValue}
-              getFieldChanged={this.handleFieldChanged}
-              setFieldDirty={this.handleFieldChanged}
-            />
-            m
-            <InputText
-              className="dib"
-              labelText="Height"
-              fieldName="heightCm"
-              fieldValue={heightCmValue}
-              getFieldChanged={this.handleFieldChanged}
-              setFieldDirty={this.handleFieldChanged}
-            />
-            cm
+          <div className="p10-0">
+            <div>Height</div>
+            <div className="df aic">
+              <InputInt
+                className="dib"
+                fieldName="heightM"
+                fieldValue={heightMValue}
+                getFieldChanged={this.handleFieldChanged}
+                setFieldDirty={this.handleFieldChanged}
+              />
+              m
+              <InputInt
+                className="dib"
+                fieldName="heightCm"
+                fieldValue={heightCmValue}
+                getFieldChanged={this.handleFieldChanged}
+                setFieldDirty={this.handleFieldChanged}
+              />
+              cm
+            </div>
           </div>
-          <div className="p10-0 df aic">
-            <InputText
-              className="dib"
-              labelText="Weight"
-              fieldName="weight"
-              fieldValue={weightValue}
-              getFieldChanged={this.handleFieldChanged}
-              setFieldDirty={this.handleFieldChanged}
-            />
-            kg
+          <div className="p10-0">
+            <div>Weight</div>
+            <div className="df aic">
+              <InputInt
+                className="dib"
+                fieldName="weight"
+                fieldValue={weightValue}
+                getFieldChanged={this.handleFieldChanged}
+                setFieldDirty={this.handleFieldChanged}
+              />
+              kg
+            </div>
           </div>
           <div className="p10-0">
             <InputDate
@@ -254,7 +291,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Age"
               fieldName="age"
               fieldValue={ageValue}
@@ -276,7 +313,7 @@ class CharacterFormPage extends React.Component {
         <section className="p20-0 m20-0">
           <h2>Stats</h2>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Hit Points (hp)"
               fieldName="hp"
               fieldValue={hpValue}
@@ -285,7 +322,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Strength (str)"
               fieldName="str"
               fieldValue={strValue}
@@ -294,8 +331,8 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
-              labelText="INtelligence (int)"
+            <InputInt
+              labelText="Intelligence (int)"
               fieldName="int"
               fieldValue={intValue}
               getFieldChanged={this.handleFieldChanged}
@@ -303,7 +340,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Wisdom (wis)"
               fieldName="wis"
               fieldValue={wisValue}
@@ -312,7 +349,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Constitution (con)"
               fieldName="con"
               fieldValue={conValue}
@@ -321,7 +358,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Dexterity (dex)"
               fieldName="dex"
               fieldValue={dexValue}
@@ -330,7 +367,7 @@ class CharacterFormPage extends React.Component {
             />
           </div>
           <div className="p10-0">
-            <InputText
+            <InputInt
               labelText="Charisma (cha)"
               fieldName="cha"
               fieldValue={chaValue}
@@ -361,4 +398,8 @@ class CharacterFormPage extends React.Component {
   }
 }
 
-export default CharacterFormPage;
+const mapStateToProps = ({ appReducer : { selectedCampaign } }) => ({
+  selectedCampaign,
+})
+
+export default connect(mapStateToProps)(CharacterFormPage);

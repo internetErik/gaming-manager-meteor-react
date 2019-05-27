@@ -26,7 +26,10 @@ class CharacterListPage extends React.Component {
         <h2>PCs</h2>
         {
         pcs.map(({ _id, userId, firstName, middleName, lastName }) => (
-        <div className="p10-0">
+        <div
+          key={_id}
+          className="p10-0"
+        >
           <Link to={`/CharacterDetail/${ _id }`}>
             { firstName } { middleName } { lastName }
           </Link>
@@ -46,7 +49,10 @@ class CharacterListPage extends React.Component {
           <h2>NPCs</h2>
           {
           npcs.map(({ _id, userId, firstName, middleName, lastName }) => (
-          <div className="p10-0">
+          <div
+            key={_id}
+            className="p10-0"
+          >
             <Link to={`/CharacterDetail/${ _id }`}>
               { firstName } { middleName } { lastName }
             </Link>

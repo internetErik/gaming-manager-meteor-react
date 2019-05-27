@@ -5,7 +5,7 @@ import { simpleRoll } from '../util/dice';
 export const Battles = new Mongo.Collection('battles');
 
 Meteor.methods({
-	insertBattle : battle => {
+	'battle.insert' : battle => {
 		if (battle) {
 			battle.createDate  = Date.now();
 			battle.complete    = false;
@@ -13,8 +13,8 @@ Meteor.methods({
 			return Battles.insert(battle);
 		}
 	},
-	removeBattle: _id => Battles.remove({ _id }),
-	updateBattle : (_id, battle) => {
+	'battle.remove' : _id => Battles.remove({ _id }),
+	'battle.update' : (_id, battle) => {
 		const { combatPhase, combatants } = battle;
 		// if everyone has submitted their action, we roll for their initiative
 		if (combatPhase === 0 && combatants.every(c => c.actionSubmitted || c.roundsOccupied > 0 )) {
@@ -35,5 +35,5 @@ Meteor.methods({
 
 		return Battles.update({ _id }, battle);
 	},
-	finishBattle: _id => Battles.update({ _id }, { $set: { complete : true } }),
+	'battle.finish' : _id => Battles.update({ _id }, { $set: { complete : true } }),
 });

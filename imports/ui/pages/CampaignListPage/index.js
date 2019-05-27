@@ -57,7 +57,7 @@ const mapDispatchToProps = dispatcher => ({
 
 const connectedCampaignListPage = connect(mapStateToProps, mapDispatchToProps)(CampaignListPage);
 
-export default  withTracker(() => {
+export default withTracker(() => {
   Meteor.subscribe('campaigns');
   return {
     campaigns : Campaigns.find({}).fetch(),
