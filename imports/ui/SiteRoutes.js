@@ -8,6 +8,7 @@ import {
   CampaignFormPage,
   CharacterListPage,
   CharacterFormPage,
+  TestFormPage,
 } from './pages';
 
 const SiteRoutes = ({ currentUser }) => (
@@ -62,6 +63,15 @@ const SiteRoutes = ({ currentUser }) => (
     path='/character-form'
     render={props =>
       <CharacterFormPage
+        { ...props }
+        currentUser={currentUser}
+      />
+    }
+  />
+  <Route
+    path='/test'
+    render={props =>
+      <TestFormPage
         { ...props }
         currentUser={currentUser}
       />

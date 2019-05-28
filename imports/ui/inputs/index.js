@@ -4,6 +4,8 @@ import InputInt      from './InputInt';
 import InputDate     from './InputDate';
 import InputSelect   from './InputSelect';
 
+import ConfigurableForm   from './ConfigurableForm';
+
 import InputError   from './InputError';
 
 // util
@@ -22,6 +24,7 @@ export {
 
   InputError,
 
+  ConfigurableForm,
   // util
   getDirtyFields,
   formHasErrors,
