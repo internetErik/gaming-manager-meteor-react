@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import InputError from '../InputError';
+
 export default class ConfigurableForm extends React.Component {
 
   constructor(props) {
@@ -30,7 +32,10 @@ export default class ConfigurableForm extends React.Component {
       initialValues[`${ name }Value`] = defaultValue;
       initialDirty[`${ name }Dirty`]  = defaultDirty;
       Object.keys(defaultErrors)
-      .forEach(errorType => initialErrors[`${ name }.${ errorType }`] = defaultErrors[errorType])
+      .forEach(errorType => {
+        const { value } =  defaultErrors[errorType]
+        initialErrors[`${ name }.${ errorType }`] = value;
+      })
     })
 
     this.setState({
@@ -48,7 +53,7 @@ export default class ConfigurableForm extends React.Component {
 
   handleFieldDirty = change => {
     const dirty = { ...this.state.dirty, ...change };
-    this.setState({ dirty })
+    this.setState({ dirty }, () => this.formValidation())
   }
 
   callOnChange = () => this.props.onChange([
@@ -78,13 +83,18 @@ export default class ConfigurableForm extends React.Component {
 
   generateForm = () => {
     const { configuration : { types, form } } = this.props;
-    const { values } = this.state;
-    return form.map((({ type, name, label, children }) => {
+    const { values, errors } = this.state;
+    return form.map((({ type, name, label, defaultErrors, children }) => {
       const Input = types[type];
       if(!Input) {
         console.warn(`Bad type '${ type }'`);
         return <div></div>
       }
+
+      const errorKeys = Object.keys(defaultErrors);
+      const hasError =
+        errorKeys.reduce((acc, errorType) => acc ? acc : errors[`${ name }.${ errorType }`], false);
+
       return (
       <div key={name}>
         <Input
@@ -93,9 +103,22 @@ export default class ConfigurableForm extends React.Component {
           getFieldChanged={this.handleFieldChanged}
           setFieldDirty={this.handleFieldDirty}
           labelText={label || name}
+          hasError={hasError}
         >
         { children }
         </Input>
+        {
+          errorKeys.map((errorType) => {
+            const { message } = defaultErrors[errorType];
+            return (
+            <InputError
+              key={errorType}
+              hasError={errors[`${ name }.${ errorType }`]}
+              renderMessage={() => <span>{ message }</span>}
+            />
+            )
+          })
+        }
       </div>
       )
     }))

@@ -30,7 +30,7 @@ const config = {
       defaultValue : '',
       defaultDirty : false,
       defaultErrors : {
-        errorRequired : false,
+        errorRequired : { value : false, message : 'This field is Required' },
       },
     },
     {
@@ -40,7 +40,7 @@ const config = {
       defaultValue : '',
       defaultDirty : false,
       defaultErrors : {
-        errorRequired : false,
+        errorRequired : { value : false, message : 'This field is Required' },
       },
     },
   ],
