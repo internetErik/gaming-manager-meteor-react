@@ -43,6 +43,28 @@ const config = {
         errorRequired : { value : false, message : 'This field is Required' },
       },
     },
+    [
+      {
+        type  : 'InputText',
+        name  : 'innerTestField',
+        label : 'Inner Test Field',
+        defaultValue : '',
+        defaultDirty : false,
+        defaultErrors : {
+          errorRequired : { value : false, message : 'This field is Required' },
+        },
+      },
+      {
+        type  : 'InputText',
+        name  : 'innerTestField2',
+        label : 'Inner Test Field 2',
+        defaultValue : '',
+        defaultDirty : false,
+        defaultErrors : {
+          errorRequired : { value : false, message : 'This field is Required' },
+        },
+      },
+    ],
   ],
 };
 

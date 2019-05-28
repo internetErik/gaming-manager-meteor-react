@@ -8,9 +8,6 @@ export default class ConfigurableForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      initialValues : {},
-      initialDirty  : {},
-      initialErrors : {},
       values : {},
       dirty  : {},
       errors : {},
@@ -23,26 +20,35 @@ export default class ConfigurableForm extends React.Component {
     onChange      : PropTypes.func.isRequired,
   }
 
+  initialValues = {};
+  initialDirty  = {};
+  initialErrors = {};
+
   componentWillMount() {
-    const { configuration : { form, types, errorTypes } } = this.props;
-    const initialValues = {};
-    const initialDirty  = {};
-    const initialErrors = {};
-    form.forEach(({ name, defaultValue, defaultDirty, defaultErrors, }) => {
-      initialValues[`${ name }Value`] = defaultValue;
-      initialDirty[`${ name }Dirty`]  = defaultDirty;
-      Object.keys(defaultErrors)
-      .forEach(errorType => {
-        const { value } =  defaultErrors[errorType]
-        initialErrors[`${ name }.${ errorType }`] = value;
-      })
+    const { configuration : { form } } = this.props;
+    form.forEach(row => {
+      if(Array.isArray(row)) {
+        row.forEach(this.setupInput);
+        return;
+      }
+
+      this.setupInput(row)
     })
 
     this.setState({
-      initialValues, initialDirty, initialErrors,
-      values : initialValues,
-      dirty  : initialDirty,
-      errors : initialErrors,
+      values : this.initialValues,
+      dirty  : this.initialDirty,
+      errors : this.initialErrors,
+    })
+  }
+
+  setupInput = ({ name, defaultValue, defaultDirty, defaultErrors }) => {
+    this.initialValues[`${ name }Value`] = defaultValue;
+    this.initialDirty[`${ name }Dirty`]  = defaultDirty;
+    Object.keys(defaultErrors)
+    .forEach(errorType => {
+      const { value } =  defaultErrors[errorType]
+      this.initialErrors[`${ name }.${ errorType }`] = value;
     })
   }
 
@@ -63,14 +69,14 @@ export default class ConfigurableForm extends React.Component {
   ])
 
   formValidation = () => new Promise((resolve, reject) => {
-    const { initialErrors, dirty, values } = this.state;
+    const { dirty, values } = this.state;
     const { configuration : { errorTypes } } = this.props;
 
     // start with all errors in default state;
-    const errors = { ...initialErrors };
+    const errors = { ...this.initialErrors };
 
     // iterate through all errors and check them
-    Object.keys(initialErrors).forEach(key => {
+    Object.keys(this.initialErrors).forEach(key => {
       const [ fieldName, errorType ] = key.split('.');
       // only test field if it is dirty
       if(dirty[`${ fieldName }Dirty`])
@@ -81,46 +87,71 @@ export default class ConfigurableForm extends React.Component {
     this.setState({ errors }, resolve)
   })
 
-  generateForm = () => {
-    const { configuration : { types, form } } = this.props;
+  generateHeading = ele => {}
+
+  generateInput = ({ type, name, label, defaultErrors, children }) => {
+    const { configuration : { types } } = this.props;
     const { values, errors } = this.state;
-    return form.map((({ type, name, label, defaultErrors, children }) => {
-      const Input = types[type];
-      if(!Input) {
-        console.warn(`Bad type '${ type }'`);
-        return <div></div>
+    const Input = types[type];
+    if(!Input) {
+      console.warn(`Bad type '${ type }'`);
+      return <div></div>
+    }
+
+    const errorKeys = Object.keys(defaultErrors);
+    const hasError =
+      errorKeys.reduce((acc, errorType) => acc ? acc : errors[`${ name }.${ errorType }`], false);
+
+    return (
+    <div key={name}>
+      <Input
+        fieldName={name}
+        fieldValue={values[`${ name }Value`]}
+        getFieldChanged={this.handleFieldChanged}
+        setFieldDirty={this.handleFieldDirty}
+        labelText={label || name}
+        hasError={hasError}
+      >
+      { children }
+      </Input>
+      {
+        errorKeys.map((errorType) => {
+          const { message } = defaultErrors[errorType];
+          return (
+          <InputError
+            key={errorType}
+            hasError={errors[`${ name }.${ errorType }`]}
+            renderMessage={() => <span>{ message }</span>}
+          />
+          )
+        })
       }
+    </div>
+    )
+  }
 
-      const errorKeys = Object.keys(defaultErrors);
-      const hasError =
-        errorKeys.reduce((acc, errorType) => acc ? acc : errors[`${ name }.${ errorType }`], false);
+  generateInputRow = (row, key) => {
+    return (
+    <div
+      key={key}
+      className="configurable-form-row df aic"
+    >
+    {
+      row.map(this.generateInput)
+    }
+    </div>
+    )
+  }
 
-      return (
-      <div key={name}>
-        <Input
-          fieldName={name}
-          fieldValue={values[`${ name }Value`]}
-          getFieldChanged={this.handleFieldChanged}
-          setFieldDirty={this.handleFieldDirty}
-          labelText={label || name}
-          hasError={hasError}
-        >
-        { children }
-        </Input>
-        {
-          errorKeys.map((errorType) => {
-            const { message } = defaultErrors[errorType];
-            return (
-            <InputError
-              key={errorType}
-              hasError={errors[`${ name }.${ errorType }`]}
-              renderMessage={() => <span>{ message }</span>}
-            />
-            )
-          })
-        }
-      </div>
-      )
+  generateForm = () => {
+    const { configuration : { form } } = this.props;
+    return form.map(((ele, i) => {
+
+      if(Array.isArray(ele))
+        return this.generateInputRow(ele, i)
+
+      return this.generateInput(ele);
+
     }))
   }
 
