@@ -47,7 +47,6 @@ const config = {
       {
         type  : 'InputText',
         name  : 'innerTestField',
-        label : 'Inner Test Field',
         defaultValue : '',
         defaultDirty : false,
         defaultErrors : {
@@ -55,9 +54,12 @@ const config = {
         },
       },
       {
+        type   : 'CUSTOM',
+        render : key => <span key={key}>meters</span>
+      },
+      {
         type  : 'InputText',
         name  : 'innerTestField2',
-        label : 'Inner Test Field 2',
         defaultValue : '',
         defaultDirty : false,
         defaultErrors : {
