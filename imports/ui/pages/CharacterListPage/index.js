@@ -25,21 +25,24 @@ class CharacterListPage extends React.Component {
       <section className="p20-0 m20-0">
         <h2>PCs</h2>
         {
-        pcs.map(({ _id, userId, firstName, middleName, lastName }) => (
-        <div
-          key={_id}
-          className="p10-0"
-        >
-          <Link to={`/CharacterDetail/${ _id }`}>
-            { firstName } { middleName } { lastName }
-          </Link>
-          {currentUser._id === userId &&
-          <span onClick={() => this.selectCharacter(character)}>
-            Select
-          </span>
-          }
-        </div>
-        ))
+        pcs.map(character => {
+          const { _id, userId, firstName, middleName, lastName } = character;
+          return (
+          <div
+            key={_id}
+            className="p10-0"
+          >
+            <Link to={`/character/${ _id }`}>
+              { firstName } { middleName } { lastName }
+            </Link>
+            {currentUser._id === userId &&
+            <span onClick={() => this.selectCharacter(character)}>
+              Select
+            </span>
+            }
+          </div>
+          )
+        })
         }
       </section>
       {currentUser._id === selectedCampaign.creator &&

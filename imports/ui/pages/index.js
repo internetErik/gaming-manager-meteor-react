@@ -4,6 +4,7 @@ import CampaignListPage  from './CampaignListPage';
 import CampaignFormPage  from './CampaignFormPage';
 import CharacterListPage from './CharacterListPage';
 import CharacterFormPage from './CharacterFormPage';
+import CharacterDetailPage from './CharacterDetailPage';
 import TestFormPage from './TestFormPage';
 
 export {
@@ -13,5 +14,6 @@ export {
   CampaignFormPage,
   CharacterListPage,
   CharacterFormPage,
+  CharacterDetailPage,
   TestFormPage,
 };

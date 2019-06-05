@@ -7,41 +7,76 @@ export default class ConfigurableForm extends React.Component {
 
   constructor(props) {
     super(props);
+
+    const { configuration : { form } } = props;
+
+    // iterate through form elements to set up initial state
+    // this will also populate initialValues, etc
+    form.forEach(row => {
+      if(Array.isArray(row))
+        row.forEach(this.setupInput);
+      else
+        this.setupInput(row)
+    })
+
     this.state = {
-      values : {},
-      dirty  : {},
-      errors : {},
+      values : this.initialValues,
+      dirty  : this.initialDirty,
+      errors : this.initialErrors,
     }
   }
 
-  static propTypes = {
-    className     : PropTypes.string,
-    configuration : PropTypes.object.isRequired,
-    onChange      : PropTypes.func.isRequired,
-  }
-
+  // these are used for resetting form, or getting the expected field keys
   initialValues = {};
   initialDirty  = {};
   initialErrors = {};
 
-  componentWillMount() {
-    const { configuration : { form } } = this.props;
-    form.forEach(row => {
-      if(Array.isArray(row)) {
-        row.forEach(this.setupInput);
-        return;
-      }
-
-      this.setupInput(row)
-    })
-
-    this.setState({
-      values : this.initialValues,
-      dirty  : this.initialDirty,
-      errors : this.initialErrors,
-    })
+  static propTypes = {
+    className      : PropTypes.string,
+    configuration  : PropTypes.object.isRequired,
+    onChange       : PropTypes.func,
+    getSetDirtyFn  : PropTypes.func,
+    getAllValuesFn : PropTypes.func,
+    getAllDirtyFn  : PropTypes.func,
+    getAllErrorsFn : PropTypes.func,
   }
 
+  shouldComponentUpdate(newProps, newState) {
+    // only update this form when there is a new internal state
+    return this.state !== newState;
+  }
+
+  componentDidMount() {
+    // provide outside world a way to flag everything as dirty (e.g., for onSubmit)
+    const { onChange, getSetDirtyFn, getAllValuesFn, getAllDirtyFn, getAllErrorsFn } = this.props;
+    if(getSetDirtyFn) getSetDirtyFn(this.setAllDirty);
+
+    if(getAllValuesFn) getAllValuesFn(() => this.state.values);
+    if(getAllDirtyFn) getAllDirtyFn(() => this.state.dirty);
+    if(getAllErrorsFn) getAllErrorsFn(() => this.state.errors);
+
+    // now that this component is loaded give initial values to external world once
+    if(onChange) this.callOnChange();
+  }
+
+  /**
+   * Function that sets all fields dirty (based on entried in initialDirty)
+   */
+  setAllDirty = () => new promise((resolve, reject) => {
+    const dirty = object.keys(this.initialDirty).reduce((acc, key) => ({ ...acc, [key] : true }), {})
+    this.setState({ dirty }, resolve);
+  });
+
+  /**
+   * When component constructor is run it calls this to setup all the initial
+   * values in order to generate the first state
+   *
+   * @param  {String} element.type          The type of the form element
+   * @param  {String} element.name          The name (fieldName) of the form element
+   * @param  {Object} element.defaultValue  The default value of form element
+   * @param  {Object} element.defaultDirty  The default dirty/touched state of the element
+   * @param  {Object} element.defaultErrors What errors are true/false by default
+   */
   setupInput = ({ type, name, defaultValue, defaultDirty, defaultErrors }) => {
     if(type === 'CUSTOM') return;
 
@@ -54,22 +89,40 @@ export default class ConfigurableForm extends React.Component {
     })
   }
 
+  /**
+   * Whenever a form field changes, this updates the values and sends this data
+   * to consumer of ConfirugableForm
+   *
+   * @param  {Object} change Object representing the change in the form
+   */
   handleFieldChanged = change => {
     const values = { ...this.state.values, ...change };
     this.setState({ values }, () => this.formValidation().then(this.callOnChange))
   }
 
+  /**
+   * When a form field is blurred it seeks to flag itself as dirty/touched
+   *
+   * @param  {Object} change contains info about field being flagged dirty
+   */
   handleFieldDirty = change => {
     const dirty = { ...this.state.dirty, ...change };
     this.setState({ dirty }, () => this.formValidation())
   }
 
-  callOnChange = () => this.props.onChange([
+  /**
+   * When there is a change on the form, we update the outside world with this
+   * method
+   */
+  callOnChange = () => this.props.onChange && this.props.onChange ([
     this.state.errors,
     this.state.dirty,
     this.state.values,
   ])
 
+  /**
+   * Validates the form using the configured error checks
+   */
   formValidation = () => new Promise((resolve, reject) => {
     const { dirty, values } = this.state;
     const { configuration : { errorTypes } } = this.props;
@@ -89,13 +142,24 @@ export default class ConfigurableForm extends React.Component {
     this.setState({ errors }, resolve)
   })
 
-  generateHeading = ele => {}
-
+  /**
+   * Generates the react elements for representing a configured element based
+   * on its configuration
+   *
+   * @param  {String} element.type          the type of input of 'CUSTOM' for an element that has a render function
+   * @param  {String} element.name          field name of the input
+   * @param  {String} element.label         Label for input if one is used
+   * @param  {Object} element.defaultErrors Used for generating error messages and figuring out if we are in an error state
+   * @param  {Object} element.children      Children, in case an input (e.g., select) needs them
+   * @param  {func}   element.render        Non-input types will use the render method to display themselves
+   * @param  {Number} key                   Used to give a unique key for diffing CUSTOM elements
+   * @return {Object}                       Input/Element being rendered
+   */
   generateInput = ({ type, name, label, defaultErrors, children, render }, key) => {
     const { configuration : { types } } = this.props;
     const { values, errors } = this.state;
 
-    if(type === 'CUSTOM') return render(key);
+    if(type === 'CUSTOM') return render(key+'CUSTOM', values, errors);
 
     const Input = types[type];
     if(!Input) {
@@ -135,6 +199,13 @@ export default class ConfigurableForm extends React.Component {
     )
   }
 
+  /**
+   * This if for times when a nested array is found in the form configuration
+   *
+   * @param  {Array} row The row of inputs being rendered
+   * @param  {Object} key used for react diffing
+   * @return {Object}     Row or inputs
+   */
   generateInputRow = (row, key) => (
   <div
     key={key}

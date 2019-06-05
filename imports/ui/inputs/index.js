@@ -1,8 +1,9 @@
-import InputText     from './InputText';
-import InputTextarea from './InputTextarea';
-import InputInt      from './InputInt';
-import InputDate     from './InputDate';
-import InputSelect   from './InputSelect';
+import InputText        from './InputText';
+import InputTextarea    from './InputTextarea';
+import InputInt         from './InputInt';
+import InputDate        from './InputDate';
+import InputSelect      from './InputSelect';
+import InputMultiSelect from './InputMultiSelect';
 
 import ConfigurableForm   from './ConfigurableForm';
 
@@ -21,6 +22,7 @@ export {
   InputInt,
   InputDate,
   InputSelect,
+  InputMultiSelect,
 
   InputError,
 
